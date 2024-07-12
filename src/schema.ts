@@ -1,0 +1,30 @@
+import { z } from "zod";
+
+export const signupSchema = z.object({
+  username: z
+    .string({ message: "this field is required" })
+    .trim()
+    .min(3, "username must contain at least 3 characters")
+    .max(30, "username may only contain 30 characters or less"),
+
+  email: z
+    .string({ message: "this field is required" })
+    .email("email must be in a valid email format e.g example@random.com"),
+  password: z
+    .string({ message: "password is required" })
+    .min(6, "password must contain a minimum of 6 characters"),
+});
+
+export const loginSchema = z.object({
+  email: z
+    .string({ message: "this field is required" })
+    .email("email must be in a valid email format e.g example@random.com"),
+  password: z
+    .string({ message: "password is required" })
+    .min(6, "password must contain a minimum of 6 characters"),
+});
+
+export const projectSchema = z.object({
+  description: z.string().trim().max(300).optional(),
+  title: z.string().trim().min(5).max(100),
+});
