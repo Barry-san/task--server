@@ -17,7 +17,7 @@ const insertUser = async (
     });
     return user;
   } catch (error) {
-    throw new AppError("email already in use", StatusCodes.BAD_REQUEST);
+    throw new AppError("email already in use", StatusCodes.CONFLICT);
   }
 };
 

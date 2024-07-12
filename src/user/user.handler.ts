@@ -1,10 +1,10 @@
 import express from "express";
 import userRepository from "./user.repository";
 import userServices from "./user.services";
-import { signupValidator, loginValidator } from "../middlewares/validator";
-import { AppError } from "../err";
+import { validator } from "../middlewares/validator";
 import { requireAuth } from "../middlewares/requireAuth";
 import { StatusCodes } from "http-status-codes";
+import { loginSchema, signupSchema } from "../schema";
 
 export const userRouter = express.Router();
 
@@ -13,11 +13,11 @@ userRouter.get("/", async (_, res) => {
   res.json({ length: users.length, data: users });
 });
 
-userRouter.post("/signup", signupValidator, async (req, res, next) => {
+userRouter.post("/signup", validator(signupSchema), async (req, res, next) => {
   try {
     const { email, password, username } = req.body;
     const user = await userServices.createUser(username, password, email);
-    return res.status(StatusCodes.OK).json({
+    return res.status(StatusCodes.CREATED).json({
       isSuccess: true,
       user,
     });
@@ -26,7 +26,7 @@ userRouter.post("/signup", signupValidator, async (req, res, next) => {
   }
 });
 
-userRouter.post("/login", loginValidator, async (req, res, next) => {
+userRouter.post("/login", validator(loginSchema), async (req, res, next) => {
   try {
     const { email, password } = req.body;
     console.log(password);

@@ -38,7 +38,8 @@ async function Login(email: string, password: string) {
 }
 
 async function generateToken(id: string) {
-  const token = jwt.sign({ id }, process.env.ACCESS_TOKEN_KEY || "", {
+  console.log(process.env.ACCESS_TOKEN_KEY);
+  const token = jwt.sign({ id }, process.env.ACCESS_TOKEN_KEY as string, {
     expiresIn: "10d",
   });
   return token;
