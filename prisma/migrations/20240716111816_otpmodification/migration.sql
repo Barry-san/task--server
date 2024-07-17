@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "OTP" ALTER COLUMN "expiresAt" SET DATA TYPE BIGINT;
