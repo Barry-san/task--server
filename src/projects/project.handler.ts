@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
 import { validator } from "../middlewares/validator";
-import { projectSchema } from "../schema";
+import { projectSchema, taskSchema } from "../schema";
 import { StatusCodes } from "http-status-codes";
 import projectServices from "./project.services";
+import { z } from "zod";
 
 export const projectRoute = Router();
 projectRoute.use(requireAuth);
@@ -50,3 +51,42 @@ projectRoute.delete("/:id", async (req, res, next) => {
     next(error);
   }
 });
+
+projectRoute.post("/:id", validator(taskSchema), async (req, res, next) => {
+  const { title, description, isDone } = req.body;
+  const user = res.locals;
+  try {
+    const result = await projectServices.addTask(user.id, req.params.id, {
+      title,
+      description,
+      isDone,
+    });
+    res.status(StatusCodes.CREATED).json({
+      isSuccess: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+projectRoute.post(
+  "/:id/addCollaborator",
+  validator(z.object({ email: z.string().email() })),
+  async (req, res, next) => {
+    const { email } = req.body;
+    const user = res.locals;
+    try {
+      const response = projectServices.addCollaborator(
+        req.params.id,
+        email,
+        user.id
+      );
+      res.json({ isSuccess: true, data: response });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// projectRoute.put("/:id/:task", validator(taskSchema), async (req, res) => {});

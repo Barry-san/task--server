@@ -7,10 +7,14 @@ async function getUserProjects(id: string) {
     },
     select: {
       id: true,
-      tasks: true,
+      tasks: {
+        take: 10,
+      },
       name: true,
       description: true,
+      collaborators: true,
     },
+    take: 10,
   });
   return projects;
 }
@@ -46,9 +50,41 @@ async function deleteProject(pID: string, uID: string) {
   return response;
 }
 
+async function addTask(
+  pID: string,
+  task: { title: string; description?: string; isDone: boolean }
+) {
+  const result = await prisma.task.create({
+    data: {
+      isDone: task.isDone,
+      projectId: pID,
+      description: task.description,
+      Title: task.title,
+      priority: "low",
+    },
+  });
+  return result;
+}
+
+async function addCollaborator(Pid: string, user: { id: string }) {
+  console.log(user.id);
+  const result = await prisma.project.update({
+    where: { id: Pid },
+    data: {
+      collaborators: {
+        connect: { id: user.id },
+      },
+    },
+  });
+  console.log(result);
+  return result;
+}
+
 export default {
   getUserProjects,
   createProject,
   getProjectById,
   deleteProject,
+  addTask,
+  addCollaborator,
 };
