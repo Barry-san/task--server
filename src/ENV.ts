@@ -8,8 +8,13 @@ config({
 const env = z.object({
   DATABASE_URL: z.coerce.string(),
   SALT: z.coerce.string(),
-  ACCESS_TOKEN_KEY: z.coerce.string().default(""),
+  ACCESS_TOKEN_KEY: z.coerce.string(),
+  REFRESH_TOKEN_KEY: z.coerce.string(),
   PORT: z.coerce.number().default(3000),
+  SMTP_HOST: z.coerce.string(),
+  SMTP_PORT: z.coerce.number(),
+  SMTP_USER: z.coerce.string(),
+  SMTP_PASSWORD: z.coerce.string(),
 });
 
 export const env_vars = env.parse(process.env);
