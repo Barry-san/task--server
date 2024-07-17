@@ -9,7 +9,7 @@ export const requireAuth: Handler = (req, res, next) => {
   if (!token)
     return res.status(httpstatus.UNAUTHORIZED).json({
       isSuccess: true,
-      message: "This resource requires an access token",
+      message: "you need to be authenticated to access this resource",
     });
 
   verify(token, process.env.ACCESS_TOKEN_KEY as string, async (err) => {
@@ -21,6 +21,13 @@ export const requireAuth: Handler = (req, res, next) => {
   });
 
   const user = decodeUserToken(token);
+  if (!user.isVerified)
+    next(
+      new AppError(
+        "user must be verified to use this feature",
+        StatusCodes.FORBIDDEN
+      )
+    );
   res.locals = user;
   next();
 };
@@ -29,5 +36,5 @@ function decodeUserToken(token: string) {
   const userToken = JSON.parse(
     Buffer.from(token.split(".")[1], "base64").toString()
   );
-  return userToken as { id: string };
+  return userToken as { id: string; isVerified: boolean };
 }
