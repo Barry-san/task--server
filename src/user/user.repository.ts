@@ -28,6 +28,7 @@ const getUsers = async () => {
       createdAt: true,
       username: true,
       email: true,
+      isVerified: true,
     },
   });
   return users;
@@ -66,4 +67,27 @@ const deleteUser = async (id: string) => {
   });
 };
 
-export default { insertUser, getUsers, deleteUser, getUser, getUserByEmail };
+const updateUser = async (
+  uid: string,
+  userFields: Partial<{
+    username: string;
+    password: string;
+    email: string;
+    isVerified: boolean;
+  }>
+) => {
+  const user = await prisma.user.update({
+    where: { id: uid },
+    data: userFields,
+  });
+  return user;
+};
+
+export default {
+  insertUser,
+  getUsers,
+  deleteUser,
+  getUser,
+  getUserByEmail,
+  updateUser,
+};

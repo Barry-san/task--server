@@ -29,7 +29,6 @@ userRouter.post("/signup", validator(signupSchema), async (req, res, next) => {
 userRouter.post("/login", validator(loginSchema), async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    console.log(password);
     const user = await userServices.Login(email, password);
     res.json({
       status: "success",
