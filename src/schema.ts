@@ -30,10 +30,17 @@ export const projectSchema = z.object({
 });
 
 export const taskSchema = z.object({
-  title: z.string({ message: "this filed is required" }).max(150),
+  title: z
+    .string({ message: "this filed is required" })
+    .max(150, "task title must be 150 characters or less. "),
   description: z
     .string({ invalid_type_error: "descritpion must be a string" })
     .max(300, { message: "description must be 300 characters or less" })
     .optional(),
-  isComplete: z.boolean().default(false),
+  isDone: z.boolean().default(false),
+});
+
+export const OTPschema = z.object({
+  email: z.string().trim().email({ message: "please provide a valid email" }),
+  otp: z.number(),
 });
