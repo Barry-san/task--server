@@ -2,6 +2,9 @@ import { StatusCodes } from "http-status-codes";
 import { AppError } from "../err";
 import projectRepository from "./project.repository";
 import userRepository from "../user/user.repository";
+import taskRepository from "./tasks/tasks.repository";
+import taskServices from "./tasks/task.services";
+import prisma from "../db";
 
 async function addTask(
   userId: string,
@@ -74,11 +77,47 @@ async function addCollaborator(
   return await projectRepository.addCollaborator(projectId, user);
 }
 
+async function removeCollaborator(
+  projectId: string,
+  collaboratorId: string,
+  uid: string
+) {
+  const project = await projectRepository.getProjectById(projectId);
+  if (!project)
+    throw new AppError("project does not exist", StatusCodes.NOT_FOUND);
+
+  if (!(project.userId === uid))
+    throw new AppError(
+      "You do not have sufficient permissions to perform this operation",
+      StatusCodes.FORBIDDEN
+    );
+  return await projectRepository.removeCollaborator(projectId, collaboratorId);
+}
+
+async function deleteTask(taskId: number, uid: string) {
+  const task = await taskRepository.getTask(taskId);
+  if (!task)
+    throw new AppError(
+      "the task you're trying to access does not exist.",
+      StatusCodes.NOT_FOUND
+    );
+  const parentProject = await projectRepository.getProjectById(task.projectId);
+  if (uid !== parentProject?.userId)
+    throw new AppError(
+      "You don't have permission to delete this task",
+      StatusCodes.FORBIDDEN
+    );
+
+  return await taskServices.deleteTask(taskId);
+}
+
 export default {
-  addTask,
-  deleteProject,
   createProject,
-  getUserProjects,
+  addTask,
   getProject,
+  getUserProjects,
   addCollaborator,
+  removeCollaborator,
+  deleteProject,
+  deleteTask,
 };

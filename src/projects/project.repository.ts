@@ -67,7 +67,6 @@ async function addTask(
 }
 
 async function addCollaborator(Pid: string, user: { id: string }) {
-  console.log(user.id);
   const result = await prisma.project.update({
     where: { id: Pid },
     data: {
@@ -76,15 +75,44 @@ async function addCollaborator(Pid: string, user: { id: string }) {
       },
     },
   });
-  console.log(result);
   return result;
 }
 
+async function getCollaborators(projectId: string) {
+  const collaborators = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+    },
+    select: {
+      collaborators: true,
+    },
+  });
+
+  return collaborators;
+}
+
+async function removeCollaborator(projectId: string, collaboratorId: string) {
+  return await prisma.project.update({
+    where: {
+      id: projectId,
+    },
+    data: {
+      collaborators: {
+        delete: {
+          id: collaboratorId,
+        },
+      },
+    },
+  });
+}
+
 export default {
-  getUserProjects,
-  createProject,
-  getProjectById,
-  deleteProject,
   addTask,
+  createProject,
+  getUserProjects,
+  getProjectById,
+  getCollaborators,
+  deleteProject,
+  removeCollaborator,
   addCollaborator,
 };

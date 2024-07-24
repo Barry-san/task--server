@@ -70,8 +70,12 @@ projectRoute.post("/:id", validator(taskSchema), async (req, res, next) => {
   }
 });
 
+projectRoute.get("/:id/collaborators", async (req, res, next) => {
+  const collaborators = projectServices;
+});
+
 projectRoute.post(
-  "/:id/addCollaborator",
+  "/:id/collaborators",
   validator(z.object({ email: z.string().email() })),
   async (req, res, next) => {
     const { email } = req.body;
@@ -88,5 +92,20 @@ projectRoute.post(
     }
   }
 );
+
+projectRoute.delete("/:id/collaborators", async (req, res, next) => {
+  const user = res.locals;
+  const { id } = req.body;
+  try {
+    const project = await projectServices.removeCollaborator(
+      req.params.id,
+      id,
+      user.id
+    );
+    res.json({ isSuccess: true, project });
+  } catch (err) {
+    next(err);
+  }
+});
 
 // projectRoute.put("/:id/:task", validator(taskSchema), async (req, res) => {});
