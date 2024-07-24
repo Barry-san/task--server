@@ -5,6 +5,7 @@ import { projectSchema, taskSchema } from "../schema";
 import { StatusCodes } from "http-status-codes";
 import projectServices from "./project.services";
 import { z } from "zod";
+import projectRepository from "./project.repository";
 
 export const projectRoute = Router();
 projectRoute.use(requireAuth);
@@ -71,7 +72,15 @@ projectRoute.post("/:id", validator(taskSchema), async (req, res, next) => {
 });
 
 projectRoute.get("/:id/collaborators", async (req, res, next) => {
-  const collaborators = projectServices;
+  try {
+    const collaborators = await projectRepository.getCollaborators(
+      req.params.id
+    );
+
+    res.json({ isSuccess: true, collaborators });
+  } catch (error) {
+    next(error);
+  }
 });
 
 projectRoute.post(

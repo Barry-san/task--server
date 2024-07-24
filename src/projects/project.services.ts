@@ -4,7 +4,6 @@ import projectRepository from "./project.repository";
 import userRepository from "../user/user.repository";
 import taskRepository from "./tasks/tasks.repository";
 import taskServices from "./tasks/task.services";
-import prisma from "../db";
 
 async function addTask(
   userId: string,
@@ -77,6 +76,10 @@ async function addCollaborator(
   return await projectRepository.addCollaborator(projectId, user);
 }
 
+async function getCollaborators(projectId: string) {
+  return await projectRepository.getCollaborators(projectId);
+}
+
 async function removeCollaborator(
   projectId: string,
   collaboratorId: string,
@@ -116,6 +119,7 @@ export default {
   addTask,
   getProject,
   getUserProjects,
+  getCollaborators,
   addCollaborator,
   removeCollaborator,
   deleteProject,
