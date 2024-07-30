@@ -5,9 +5,11 @@ import { userRouter } from "./user/user.handler";
 import { projectRoute } from "./projects/project.handler";
 import { env_vars } from "./ENV";
 import { OTPRouter } from "./OTP/otp.handler";
+import cookieParser from "cookie-parser";
 
 export const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.get("/", rootHandler);
 app.use("/users", userRouter);
 app.use("/projects", projectRoute);
