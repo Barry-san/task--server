@@ -3,24 +3,42 @@ import { Handler } from "express";
 import httpstatus, { StatusCodes } from "http-status-codes";
 import { verify } from "jsonwebtoken";
 import { AppError } from "../err";
+import { env_vars } from "../ENV";
+import { generateToken, verifyRefreshToken } from "../user/user.helper";
 
 export const requireAuth: Handler = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
+  const refreshToken = req.cookies.refreshToken;
+  const token = req.cookies.accessToken;
+
   if (!token)
     return res.status(httpstatus.UNAUTHORIZED).json({
       isSuccess: true,
       message: "you need to be authenticated to access this resource",
     });
 
-  verify(token, process.env.ACCESS_TOKEN_KEY as string, async (err) => {
+  const user = decodeUserToken(token);
+
+  verify(token as string, env_vars.ACCESS_TOKEN_KEY, async (err) => {
     if (err?.name === "TokenExpiredError") {
-      return next(
-        new AppError("Invalid or expired token", StatusCodes.UNAUTHORIZED)
-      );
+      let isValidRefreshToken = verifyRefreshToken(refreshToken);
+      if (!isValidRefreshToken)
+        next(
+          new AppError(
+            "session timed out. please login and try again",
+            StatusCodes.UNAUTHORIZED
+          )
+        );
+      else {
+        res.cookie(
+          "accessToken",
+          generateToken(user.id, user.isVerified, user.username)
+        );
+        res.locals = user;
+        next();
+      }
     }
   });
 
-  const user = decodeUserToken(token);
   if (!user.isVerified)
     next(
       new AppError(
@@ -28,6 +46,7 @@ export const requireAuth: Handler = (req, res, next) => {
         StatusCodes.FORBIDDEN
       )
     );
+
   res.locals = user;
   next();
 };
@@ -36,5 +55,5 @@ function decodeUserToken(token: string) {
   const userToken = JSON.parse(
     Buffer.from(token.split(".")[1], "base64").toString()
   );
-  return userToken as { id: string; isVerified: boolean };
+  return userToken as { id: string; isVerified: boolean; username: string };
 }
