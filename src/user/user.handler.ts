@@ -29,10 +29,20 @@ userRouter.post("/signup", validator(signupSchema), async (req, res, next) => {
 userRouter.post("/login", validator(loginSchema), async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const user = await userServices.Login(email, password);
+    const { id, token, refreshToken, username } = await userServices.Login(
+      email,
+      password
+    );
+
+    res.cookie("refreshToken", refreshToken, { httpOnly: true });
+    res.cookie("accessToken", token);
     res.json({
       status: "success",
-      user,
+      user: {
+        username,
+        id,
+        token,
+      },
     });
   } catch (error) {
     next(error);

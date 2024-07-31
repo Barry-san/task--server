@@ -1,20 +1,13 @@
-import "dotenv/config";
-import { hashSync, compareSync } from "bcryptjs";
 import userRepository from "./user.repository";
-import jwt from "jsonwebtoken";
-import "dotenv/config";
 import { AppError } from "../err";
 import { StatusCodes } from "http-status-codes";
 import otpServices from "../OTP/otp.services";
-
-function hashPassword(password: string) {
-  const hashedPassword = hashSync(password);
-  return hashedPassword;
-}
-function comparePassword(password: string, hash: string) {
-  const result = compareSync(password, hash);
-  return result;
-}
+import {
+  generateToken,
+  hashPassword,
+  comparePassword,
+  generateRefreshToken,
+} from "./user.helper";
 
 async function createUser(username: string, password: string, email: string) {
   const hashedPassword = hashPassword(password);
@@ -46,22 +39,8 @@ async function Login(email: string, password: string) {
     );
 
   const token = await generateToken(user.id, user.isVerified, user.username);
-  return { id: user.id, username: user.username, token };
-}
-
-async function generateToken(
-  id: string,
-  isVerified: boolean,
-  username: string
-) {
-  const token = jwt.sign(
-    { id, isVerified, username },
-    process.env.ACCESS_TOKEN_KEY as string,
-    {
-      expiresIn: "10d",
-    }
-  );
-  return token;
+  const refreshToken = generateRefreshToken(user.id);
+  return { id: user.id, username: user.username, token, refreshToken };
 }
 
 export default { createUser, Login, updateUser };
