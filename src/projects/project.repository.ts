@@ -12,7 +12,14 @@ async function getUserProjects(id: string) {
       },
       name: true,
       description: true,
-      collaborators: true,
+      collaborators: {
+        select: {
+          id: true,
+          email: true,
+          username: true,
+          isVerified: true,
+        },
+      },
     },
     take: 10,
   });
@@ -84,7 +91,14 @@ async function getCollaborators(projectId: string) {
       id: projectId,
     },
     select: {
-      collaborators: true,
+      collaborators: {
+        select: {
+          id: true,
+          email: true,
+          username: true,
+          isVerified: true,
+        },
+      },
     },
   });
 
@@ -98,7 +112,7 @@ async function removeCollaborator(projectId: string, collaboratorId: string) {
     },
     data: {
       collaborators: {
-        delete: {
+        disconnect: {
           id: collaboratorId,
         },
       },

@@ -25,6 +25,7 @@ async function addTask(
 }
 
 async function createProject(title: string, description: string, uid: string) {
+  console.group(uid);
   const project = await projectRepository.createProject(
     title,
     description,

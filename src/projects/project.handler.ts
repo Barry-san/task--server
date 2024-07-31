@@ -90,7 +90,7 @@ projectRoute.post(
     const { email } = req.body;
     const user = res.locals;
     try {
-      const response = projectServices.addCollaborator(
+      const response = await projectServices.addCollaborator(
         req.params.id,
         email,
         user.id
