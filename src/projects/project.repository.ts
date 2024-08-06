@@ -73,12 +73,12 @@ async function addTask(
   return result;
 }
 
-async function addCollaborator(Pid: string, user: { id: string }) {
+async function addCollaborator(Pid: string, userId: string) {
   const result = await prisma.project.update({
     where: { id: Pid },
     data: {
       collaborators: {
-        connect: { id: user.id },
+        connect: { id: userId },
       },
     },
   });

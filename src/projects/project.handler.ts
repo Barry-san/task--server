@@ -8,6 +8,20 @@ import { z } from "zod";
 import projectRepository from "./project.repository";
 
 export const projectRoute = Router();
+
+projectRoute.get("/collaborate/:token", async (req, res, next) => {
+  try {
+    const token = req.params.token;
+    const response = await projectServices.addCollaborator(token);
+    return res.json({
+      isSuccess: true,
+      response,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 projectRoute.use(requireAuth);
 
 projectRoute.get("/", async (req, res) => {
@@ -90,7 +104,7 @@ projectRoute.post(
     const { email } = req.body;
     const user = res.locals;
     try {
-      const response = await projectServices.addCollaborator(
+      const response = await projectServices.inviteCollaborator(
         req.params.id,
         email,
         user.id
