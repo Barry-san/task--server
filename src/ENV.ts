@@ -15,6 +15,7 @@ const env = z.object({
   SMTP_PORT: z.coerce.number(),
   SMTP_USER: z.coerce.string(),
   SMTP_PASSWORD: z.coerce.string(),
+  DOMAIN_URL: z.coerce.string().default("http://localhost:3000"),
 });
 
 export const env_vars = env.parse(process.env);
