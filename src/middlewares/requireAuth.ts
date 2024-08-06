@@ -7,8 +7,8 @@ import { env_vars } from "../ENV";
 import { generateToken, verifyRefreshToken } from "../user/user.helper";
 
 export const requireAuth: Handler = (req, res, next) => {
-  const refreshToken = req.cookies.refreshToken;
-  const token = req.cookies.accessToken;
+  const refreshToken: string = req.cookies.refreshToken;
+  const token: string = req.cookies.accessToken;
 
   if (!token)
     return res.status(httpstatus.UNAUTHORIZED).json({
@@ -18,7 +18,7 @@ export const requireAuth: Handler = (req, res, next) => {
 
   const user = decodeUserToken(token);
 
-  verify(token as string, env_vars.ACCESS_TOKEN_KEY, async (err) => {
+  verify(token, env_vars.ACCESS_TOKEN_KEY, (err, _) => {
     if (err?.name === "TokenExpiredError") {
       let isValidRefreshToken = verifyRefreshToken(refreshToken);
       if (!isValidRefreshToken)
