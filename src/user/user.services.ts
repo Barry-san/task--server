@@ -8,6 +8,7 @@ import {
   comparePassword,
   generateRefreshToken,
 } from "./user.helper";
+import { User } from "@prisma/client";
 
 async function createUser(username: string, password: string, email: string) {
   const hashedPassword = hashPassword(password);
@@ -16,15 +17,7 @@ async function createUser(username: string, password: string, email: string) {
   return { id: user.id, username: user.username };
 }
 
-async function updateUser(
-  uid: string,
-  userFields: Partial<{
-    username: string;
-    email: string;
-    password: string;
-    isVerified: boolean;
-  }>
-) {
+async function updateUser(uid: string, userFields: Partial<User>) {
   const user = await userRepository.getUser(uid);
   if (!user) throw new AppError("user does not exist", StatusCodes.NOT_FOUND);
   return await userRepository.updateUser(uid, userFields);

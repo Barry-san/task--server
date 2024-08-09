@@ -4,7 +4,8 @@ import userServices from "./user.services";
 import { validator } from "../middlewares/validator";
 import { requireAuth } from "../middlewares/requireAuth";
 import { StatusCodes } from "http-status-codes";
-import { loginSchema, signupSchema } from "../schema";
+import { emailSchema, loginSchema, signupSchema } from "../schema";
+import otpServices from "../OTP/otp.services";
 
 export const userRouter = express.Router();
 
@@ -37,7 +38,7 @@ userRouter.post("/login", validator(loginSchema), async (req, res, next) => {
     res.cookie("refreshToken", refreshToken, { httpOnly: true });
     res.cookie("accessToken", token);
     res.json({
-      status: "success",
+      isSuccess: true,
       user: {
         username,
         id,
@@ -63,5 +64,18 @@ userRouter.delete("/:id", requireAuth, async (req, res) => {
     res
       .status(StatusCodes.OK)
       .json({ status: "success", message: "deleted user with id " + id });
+  }
+});
+
+userRouter.post("/reset", validator(emailSchema), async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    otpServices.sendUserOTP(email);
+    res.json({
+      isSuccess: true,
+      message: "password reset OTP sent successfully",
+    });
+  } catch (error) {
+    next(error);
   }
 });

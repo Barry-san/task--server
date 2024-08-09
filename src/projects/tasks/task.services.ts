@@ -1,4 +1,4 @@
-import { Task } from "../../types/tasks";
+import { Task } from "@prisma/client";
 import tasksRepository from "./tasks.repository";
 
 async function updateTask(taskId: number, taskFields: Partial<Task>) {

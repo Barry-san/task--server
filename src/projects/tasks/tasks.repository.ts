@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import prisma from "../../db";
 import { AppError } from "../../err";
-import { Task } from "../../types/tasks";
+import { Task } from "@prisma/client";
 
 async function updateTask(taskId: number, taskFields: Partial<Task>) {
   const task = await prisma.task.findFirst({

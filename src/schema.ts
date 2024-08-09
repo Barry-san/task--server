@@ -44,3 +44,13 @@ export const OTPschema = z.object({
   email: z.string().trim().email({ message: "please provide a valid email" }),
   otp: z.number(),
 });
+
+export const emailSchema = z.object({
+  email: z
+    .string({
+      invalid_type_error: "email must be of type string",
+      required_error: "this field is required",
+    })
+    .trim()
+    .email({ message: "please provide a valid email" }),
+});
