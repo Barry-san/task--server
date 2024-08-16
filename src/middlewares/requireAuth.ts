@@ -12,7 +12,7 @@ export const requireAuth: Handler = (req, res, next) => {
 
   if (!token)
     return res.status(httpstatus.UNAUTHORIZED).json({
-      isSuccess: true,
+      isSuccess: false,
       message: "you need to be authenticated to access this resource",
     });
 

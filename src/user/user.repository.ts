@@ -21,7 +21,9 @@ const insertUser = async (
   }
 };
 
-const getUsers = async () => {
+const getUsers = async (pageNumber: number) => {
+  const take = 10;
+  const skip = (pageNumber - 1) * take;
   const users = await prisma.user.findMany({
     select: {
       id: true,
@@ -30,6 +32,8 @@ const getUsers = async () => {
       email: true,
       isVerified: true,
     },
+    take,
+    skip,
   });
   return users;
 };

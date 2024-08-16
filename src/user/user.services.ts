@@ -17,6 +17,10 @@ async function createUser(username: string, password: string, email: string) {
   return { id: user.id, username: user.username };
 }
 
+async function getUsers(page: number = 1) {
+  return userRepository.getUsers(page);
+}
+
 async function updateUser(uid: string, userFields: Partial<User>) {
   const user = await userRepository.getUser(uid);
   if (!user) throw new AppError("user does not exist", StatusCodes.NOT_FOUND);
@@ -36,4 +40,4 @@ async function Login(email: string, password: string) {
   return { id: user.id, username: user.username, token, refreshToken };
 }
 
-export default { createUser, Login, updateUser };
+export default { createUser, getUsers, Login, updateUser };

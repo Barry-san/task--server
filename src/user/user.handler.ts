@@ -5,13 +5,36 @@ import { validator } from "../middlewares/validator";
 import { requireAuth } from "../middlewares/requireAuth";
 import { StatusCodes } from "http-status-codes";
 import { emailSchema, loginSchema, signupSchema } from "../schema";
+import { z, ZodError } from "zod";
 import otpServices from "../OTP/otp.services";
+import { env_vars } from "../ENV";
 
 export const userRouter = express.Router();
+const cookieSettings = {
+  maxAge: 24 * 60 * 60 * 1000,
+};
 
-userRouter.get("/", async (_, res) => {
-  const users = await userRepository.getUsers();
-  res.json({ length: users.length, data: users });
+userRouter.get("/", async (req, res, next) => {
+  try {
+    const page = req.query.page
+      ? z.coerce
+          .number({ message: "page must be a number" })
+          .int("page number must be an integer")
+          .parse(req.query.page)
+      : 1;
+    const users = await userServices.getUsers(page);
+    res.json({ isSuccess: true, page, length: users.length, data: users });
+  } catch (error) {
+    if (error instanceof ZodError)
+      return res.json({
+        isSuccess: false,
+        errors: error.errors.map((err) => ({
+          code: err.code,
+          messsage: err.message,
+        })),
+      });
+    next(error);
+  }
 });
 
 userRouter.post("/signup", validator(signupSchema), async (req, res, next) => {
@@ -35,8 +58,16 @@ userRouter.post("/login", validator(loginSchema), async (req, res, next) => {
       password
     );
 
-    res.cookie("refreshToken", refreshToken, { httpOnly: true });
-    res.cookie("accessToken", token);
+    res.cookie("refreshToken", refreshToken, {
+      secure: env_vars.NODE_ENV === "production" ? true : false,
+      path: "/",
+      maxAge: 10 * 24 * 60 * 60 * 1000,
+    });
+    res.cookie("accessToken", token, {
+      secure: env_vars.NODE_ENV === "production" ? true : false,
+      path: "/",
+      maxAge: 10 * 24 * 60 * 60 * 1000,
+    });
     res.json({
       isSuccess: true,
       user: {

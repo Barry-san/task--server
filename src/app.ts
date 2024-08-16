@@ -6,10 +6,12 @@ import { projectRoute } from "./projects/project.handler";
 import { env_vars } from "./ENV";
 import { OTPRouter } from "./OTP/otp.handler";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 export const app = express();
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({ origin: "*" }));
 app.get("/", rootHandler);
 app.use("/users", userRouter);
 app.use("/projects", projectRoute);
